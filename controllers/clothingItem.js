@@ -2,13 +2,10 @@ const ClothingItem = require("../models/clothingItem");
 const { ERROR_400, ERROR_404, ERROR_500 } = require("../utils/errors");
 
 function handleFindByIdItemError(req, res, err) {
-  if (
-    err.name === "CastError" ||
-    err.name === "ValidationError"
-  ) {
+  if (err.name === "CastError" || err.name === "ValidationError") {
     return res.status(ERROR_400).send({
       message:
-      "The methods for creating an item received invalid data, or an invalid ID was passed to the params.",
+        "The methods for creating an item received invalid data, or an invalid ID was passed to the params.",
     });
   }
   if (err.name === "DocumentNotFoundError") {
@@ -19,7 +16,7 @@ function handleFindByIdItemError(req, res, err) {
   }
   return res
     .status(ERROR_500)
-    .send({ message: "An error has occurred on the server"});
+    .send({ message: "An error has occurred on the server" });
 }
 
 const createItem = (req, res) => {
@@ -29,7 +26,7 @@ const createItem = (req, res) => {
     .then((item) => {
       res.send({ data: item });
     })
-    .catch((e) => {
+    .catch((err) => {
       handleFindByIdItemError(req, res, err);
     });
 };
@@ -89,7 +86,6 @@ function dislikeItem(req, res) {
 module.exports = {
   createItem,
   getItems,
-  updateItem,
   deleteItem,
   likeItem,
   dislikeItem,

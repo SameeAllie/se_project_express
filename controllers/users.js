@@ -40,10 +40,7 @@ const getUser = (req, res) => {
             "There is no user with the requested ID, or the request was sent to a non-existent address.",
         });
       }
-      if (
-        err.name === "ValidationError" ||
-        err.name === "CastError"
-      ) {
+      if (err.name === "ValidationError" || err.name === "CastError") {
         return res.status(ERROR_400).send({
           message:
             "Invalid data passed to the methods for creating a user, or invalid ID passed to the params",
@@ -51,7 +48,7 @@ const getUser = (req, res) => {
       }
       return res
         .status(ERROR_500)
-        .send({ message: "An error has occurred on the server."});
+        .send({ message: "An error has occurred on the server." });
     });
 };
 
