@@ -3,7 +3,7 @@ const clothingItem = require("./clothingItem");
 const User = require("./users");
 
 router.use("/items", clothingItem);
-router.use("/user", User);
+router.use("/users", User);
 
 router.use((req, res) => {
   res.status(404).send({
