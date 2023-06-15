@@ -1,4 +1,4 @@
-const User = require("../../se_project_express/models/users");
+const User = require("../models/users");
 const { ERROR_400, ERROR_404, ERROR_500 } = require("../utils/errors");
 
 function handleCatchError(res, err) {
@@ -51,7 +51,7 @@ const getUser = (req, res) => {
       }
       return res
         .status(ERROR_500)
-        .send({ message: "An error has occurred on the server.", err });
+        .send({ message: "An error has occurred on the server."});
     });
 };
 

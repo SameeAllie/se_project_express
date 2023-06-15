@@ -1,4 +1,4 @@
-const ClothingItem = require("../../se_project_express/models/clothingItem");
+const ClothingItem = require("../models/clothingItem");
 const { ERROR_400, ERROR_404, ERROR_500 } = require("../utils/errors");
 
 function handleFindByIdItemError(req, res, err) {
@@ -25,12 +25,12 @@ function handleFindByIdItemError(req, res, err) {
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
 
-  ClothingItem.create({ name, weather, imageUrl, owner: req.user_.id })
+  ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
     .then((item) => {
       res.send({ data: item });
     })
     .catch((e) => {
-      handleRegularItemError(req, res, err);
+      handleFindByIdItemError(req, res, err);
     });
 };
 
@@ -38,7 +38,7 @@ const getItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => res.send(items))
     .catch((err) => {
-      handleRegularItemError(req, res, err);
+      handleFindByIdItemError(req, res, err);
     });
 };
 
@@ -60,7 +60,7 @@ const deleteItem = (req, res) => {
 const likeItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
-    { $addToSet: { likes: req.user_.id } },
+    { $addToSet: { likes: req.user._id } },
     { new: true }
   )
     .orFail()
