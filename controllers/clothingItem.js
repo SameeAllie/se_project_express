@@ -1,23 +1,5 @@
 const ClothingItem = require("../models/clothingItem");
-const { ERROR_400, ERROR_404, ERROR_500 } = require("../utils/errors");
-
-function handleFindByIdItemError(req, res, err) {
-  if (err.name === "CastError" || err.name === "ValidationError") {
-    return res.status(ERROR_400).send({
-      message:
-        "The methods for creating an item received invalid data, or an invalid ID was passed to the params.",
-    });
-  }
-  if (err.name === "DocumentNotFoundError") {
-    return res.status(ERROR_404).send({
-      message:
-        "The requested clothing ID does not exist, or the request was sent to an invalid address.",
-    });
-  }
-  return res
-    .status(ERROR_500)
-    .send({ message: "An error has occurred on the server" });
-}
+const {ERROR_CODES, handleCatchError, handleFailError} = require("../utils/errors");
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
@@ -27,7 +9,7 @@ const createItem = (req, res) => {
       res.send({ data: item });
     })
     .catch((err) => {
-      handleFindByIdItemError(req, res, err);
+      handleCatchError(req, res, err);
     });
 };
 
@@ -35,7 +17,7 @@ const getItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => res.send(items))
     .catch((err) => {
-      handleFindByIdItemError(req, res, err);
+      handleCatchError(req, res, err);
     });
 };
 
@@ -43,14 +25,33 @@ const deleteItem = (req, res) => {
   const { itemId } = req.params;
 
   ClothingItem.findByIdAndDelete(itemId)
-    .orFail()
-    .then(() =>
+    .orFail(() => {
+      const error = new Error ("Item ID was not found");;
+      error.statusCode = 404;
+      throw error;
+    })
+    .then((item) => {
+      if (String(item.owner) !== req.user._id){
+        return res
+        .status(ERROR_CODES.Forbidden)
+        .send({message:"You do not have the authorization to delete this item"});
+      }
       res
-        .status(200)
-        .send({ message: `The item has been successfully deleted.` })
-    )
+      .status(200)
+      .send({ message: `The item has been successfully deleted.` })
+    })
     .catch((err) => {
-      handleFindByIdItemError(req, res, err);
+      if (err.statusCode === 404) {
+        res.status(ERROR_CODES.NotFound).send({ message: "Item not found" });
+      } else if (err.name === "CastError") {
+        res
+          .status(ERROR_CODES.BadRequest)
+          .send({ message: "Bad Request and/or invalid input" });
+      } else {
+        res
+          .status(ERROR_CODES.DefaultError)
+          .send({ message: "Something went wrong" });
+      }
     });
 };
 
@@ -60,12 +61,14 @@ const likeItem = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true }
   )
-    .orFail()
+    .orFail(() => {
+      handleFailError();
+    })
     .then(() =>
       res.status(200).send({ message: "Item has been successfully liked" })
     )
     .catch((err) => {
-      handleFindByIdItemError(req, res, err);
+      handleFailError(req, res, err);
     });
 };
 
@@ -79,9 +82,23 @@ function dislikeItem(req, res) {
     .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
       console.error(err);
-      handleFindByIdItemError(req, res, err);
+      handleFailError(req, res, err);
     });
 }
+
+const updateItem = (req, res) => {
+  const { itemId } = req.param;
+  const { imageUrl } = req.body;
+
+  ClothingItem.findOneAndUpdate(itemId, { $set: { imageUrl } })
+    .orFail(() => {
+      handleFailError();
+    })
+    .then((item) => res.status(200).send({ data: item }))
+    .catch((err) => {
+      handleCatchError(err, res);
+    });
+};
 
 module.exports = {
   createItem,
@@ -89,4 +106,5 @@ module.exports = {
   deleteItem,
   likeItem,
   dislikeItem,
+  updateItem,
 };
