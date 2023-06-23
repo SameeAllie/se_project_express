@@ -1,13 +1,17 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/users");
-const { handleFailError, handleCatchError, ERROR_CODES } = require("../utils/errors");
+const {
+  handleFailError,
+  handleCatchError,
+  ERROR_CODES,
+} = require("../utils/errors");
 const { JWT_SECRET } = require("../utils/config");
 
 const getCurrentUser = (req, res) => {
   const { userId } = req.params;
   User.findById(userId)
-    .orFail(()=>{
+    .orFail(() => {
       handleFailError();
     })
     .then((user) => res.status(200).send({ data: user }))
@@ -17,18 +21,18 @@ const getCurrentUser = (req, res) => {
 };
 
 const createUser = (req, res) => {
-  const { name, avatar , email, password } = req.body;
-  bcrypt.hash(password, 10). then((hash)=>{
-  User.create({ name, avatar, email, password:hash})
-  .then((user) => {
-    const userData = user.toObject();
-    delete userData.password;
-    return res.status(201).send({ data: userData });
-  })
-  .catch((err) => {
-    handleCatchError(res, err);
+  const { name, avatar, email, password } = req.body;
+  bcrypt.hash(password, 10).then((hash) => {
+    User.create({ name, avatar, email, password: hash })
+      .then((user) => {
+        const userData = user.toObject();
+        delete userData.password;
+        return res.status(201).send({ data: userData });
+      })
+      .catch((err) => {
+        handleCatchError(res, err);
+      });
   });
-})
 };
 
 const updateUser = (req, res) => {

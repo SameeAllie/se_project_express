@@ -7,11 +7,6 @@ const ERROR_CODES = {
   DefaultError: 500,
   MongoError: 11000,
 };
-module.exports = {
-  ERROR_CODES,
-  handleCatchError,
-  handleFailError
-};
 
 const handleFailError = () => {
   const error = new Error("No item found");
@@ -31,12 +26,9 @@ const handleCatchError = (err, res) => {
   } else if (err.statusCode === 404) {
     res.status(ERROR_CODES.NotFound).send({ message: "Item not found" });
   } else if (err.code === 11000) {
-    res
-      .status(ERROR_CODES.AlreadyExistsError)
-      .send({
-        message:
-          "Email address is already being used, please try another email.",
-      });
+    res.status(ERROR_CODES.AlreadyExistsError).send({
+      message: "Email address is already being used, please try another email.",
+    });
   } else {
     res
       .status(ERROR_CODES.DefaultError)
@@ -44,20 +36,8 @@ const handleCatchError = (err, res) => {
   }
 };
 
-// function handleCatchError(res, err) {
-//   if (err.name === "ValidationError") {
-//     return res.status(ERROR_400).send({
-//       message:
-//         "Invalid data passed to the methods for creating a user, or invalid ID passed to the params",
-//     });
-//   }
-//   if (err.name === "CastError") {
-//     return res.status(ERROR_400).send({
-//       message:
-//         "There is no user with the requested ID, or the request was sent to a non-existent address.",
-//     });
-//   }
-//   return res.status(ERROR_500).send({
-//     message: "An error has occurred on the server",
-//   });
-// }
+module.exports = {
+  ERROR_CODES,
+  handleCatchError,
+  handleFailError,
+};

@@ -1,5 +1,9 @@
 const ClothingItem = require("../models/clothingItem");
-const {ERROR_CODES, handleCatchError, handleFailError} = require("../utils/errors");
+const {
+  ERROR_CODES,
+  handleCatchError,
+  handleFailError,
+} = require("../utils/errors");
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
@@ -26,19 +30,21 @@ const deleteItem = (req, res) => {
 
   ClothingItem.findByIdAndDelete(itemId)
     .orFail(() => {
-      const error = new Error ("Item ID was not found");;
+      const error = new Error("Item ID was not found");
       error.statusCode = 404;
       throw error;
     })
     .then((item) => {
-      if (String(item.owner) !== req.user._id){
+      if (String(item.owner) !== req.user._id) {
         return res
-        .status(ERROR_CODES.Forbidden)
-        .send({message:"You do not have the authorization to delete this item"});
+          .status(ERROR_CODES.Forbidden)
+          .send({
+            message: "You do not have the authorization to delete this item",
+          });
       }
       res
-      .status(200)
-      .send({ message: `The item has been successfully deleted.` })
+        .status(200)
+        .send({ message: `The item has been successfully deleted.` });
     })
     .catch((err) => {
       if (err.statusCode === 404) {
