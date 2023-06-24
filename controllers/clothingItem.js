@@ -13,7 +13,7 @@ const createItem = (req, res) => {
       res.send({ data: item });
     })
     .catch((err) => {
-      handleCatchError(req, res, err);
+      handleCatchError(err, res);
     });
 };
 
@@ -21,16 +21,14 @@ const getItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => res.send(items))
     .catch((err) => {
-      handleCatchError(req, res, err);
+      handleCatchError(err, res);
     });
 };
 
 const deleteItem = (req, res) => {
-  const { itemId } = req.params;
-
-  ClothingItem.findByIdAndDelete(itemId)
+  ClothingItem.findById(req.params.itemId)
     .orFail(() => {
-      const error = new Error("Item ID was not found");
+      const error = new Error("Item ID not found");
       error.statusCode = 404;
       throw error;
     })
@@ -38,13 +36,11 @@ const deleteItem = (req, res) => {
       if (String(item.owner) !== req.user._id) {
         return res
           .status(ERROR_CODES.Forbidden)
-          .send({
-            message: "You do not have the authorization to delete this item",
-          });
+          .send({ message: "You are not authorized to delete this item" });
       }
-      res
-        .status(200)
-        .send({ message: `The item has been successfully deleted.` });
+      return item.deleteOne().then(() => {
+        res.send({ message: "Item deleted" });
+      });
     })
     .catch((err) => {
       if (err.statusCode === 404) {
@@ -74,7 +70,7 @@ const likeItem = (req, res) => {
       res.status(200).send({ message: "Item has been successfully liked" })
     )
     .catch((err) => {
-      handleFailError(req, res, err);
+      handleFailError(err, res);
     });
 };
 
@@ -88,7 +84,7 @@ function dislikeItem(req, res) {
     .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
       console.error(err);
-      handleFailError(req, res, err);
+      handleFailError(err, res);
     });
 }
 

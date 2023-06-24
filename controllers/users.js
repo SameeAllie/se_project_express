@@ -9,7 +9,8 @@ const {
 const { JWT_SECRET } = require("../utils/config");
 
 const getCurrentUser = (req, res) => {
-  const { userId } = req.params;
+  const { userId } = req.user; // Retrieve user ID from req.user object
+
   User.findById(userId)
     .orFail(() => {
       handleFailError();
@@ -22,6 +23,11 @@ const getCurrentUser = (req, res) => {
 
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
+
+  if (!password) {
+    return res.status(400).send({ error: "Password is required" });
+  }
+
   bcrypt.hash(password, 10).then((hash) => {
     User.create({ name, avatar, email, password: hash })
       .then((user) => {
@@ -29,10 +35,9 @@ const createUser = (req, res) => {
         delete userData.password;
         return res.status(201).send({ data: userData });
       })
-      .catch((err) => {
-        handleCatchError(res, err);
-      });
+      .catch((err) => handleCatchError(err, res));
   });
+  return undefined;
 };
 
 const updateUser = (req, res) => {
@@ -70,7 +75,7 @@ const login = (req, res) => {
     .catch((err) => {
       console.log(err);
       console.log(err.name);
-      handleError(err, res);
+      handleCatchError(err, res);
     });
 };
 
