@@ -9,9 +9,9 @@ const {
 const { JWT_SECRET } = require("../utils/config");
 
 const getCurrentUser = (req, res) => {
-  const { userId } = req.user; // Retrieve user ID from req.user object
+  const { _id } = req.user; // Retrieve user ID from req.user object
 
-  User.findById(userId)
+  User.findById(_id)
     .orFail(() => {
       handleFailError();
     })

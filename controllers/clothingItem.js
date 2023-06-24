@@ -70,7 +70,7 @@ const likeItem = (req, res) => {
       res.status(200).send({ message: "Item has been successfully liked" })
     )
     .catch((err) => {
-      handleFailError(err, res);
+      handleCatchError(err, res);
     });
 };
 
@@ -84,7 +84,7 @@ function dislikeItem(req, res) {
     .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
       console.error(err);
-      handleFailError(err, res);
+      handleCatchError(err, res);
     });
 }
 
