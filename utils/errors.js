@@ -10,7 +10,7 @@ const ERROR_CODES = {
 
 const handleFailError = () => {
   const error = new Error("No item found");
-  error.statusCode = error.statusCode = 404;
+  error.statusCode = 404;
   throw error;
 };
 

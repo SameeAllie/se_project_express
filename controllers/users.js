@@ -75,7 +75,7 @@ const login = (req, res) => {
     .catch((err) => {
       console.log(err);
       console.log(err.name);
-      handleError(err, res);
+      handleCatchError(err, res);
     });
 };
 
