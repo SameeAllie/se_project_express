@@ -29,7 +29,8 @@ const createUser = (req, res) => {
 };
 
 const getCurrentUser = (req, res) => {
-  const { userId } = req.params;
+  console.log(req.user);
+  const { userId } = req.user._id;
   User.findById(userId)
     .orFail(() => {
       handleFailError();
