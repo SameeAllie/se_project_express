@@ -30,7 +30,7 @@ const createUser = (req, res) => {
 
 const getCurrentUser = (req, res) => {
   console.log(req.user);
-  const { userId } = req.user._id;
+  const { userId } = req.user;
   User.findById(userId)
     .orFail(() => {
       handleFailError();
