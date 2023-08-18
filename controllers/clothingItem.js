@@ -9,9 +9,11 @@ const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
 
   ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
-    .then((item) => res.send({ data: item }))
+    .then((item) => {
+      res.send({ data: item });
+    })
     .catch((err) => {
-      handleCatchError(req, res, err);
+      handleCatchError(err, res);
     });
 };
 
@@ -19,30 +21,26 @@ const getItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => res.send(items))
     .catch((err) => {
-      handleCatchError(req, res, err);
+      handleCatchError(err, res);
     });
 };
 
 const deleteItem = (req, res) => {
-  const { itemId } = req.params;
-
-  ClothingItem.findByIdAndDelete(itemId)
+  ClothingItem.findById(req.params.itemId)
     .orFail(() => {
-      const error = new Error("Item ID was not found");
+      const error = new Error("Item ID not found");
       error.statusCode = 404;
       throw error;
     })
     .then((item) => {
       if (String(item.owner) !== req.user._id) {
-        res.status(ERROR_CODES.Forbidden).send({
-          message: "You do not have the authorization to delete this item",
-        });
-      } else {
-        res
-          .status(200)
-          .send({ message: `The item has been successfully deleted.` });
+        return res
+          .status(ERROR_CODES.Forbidden)
+          .send({ message: "You are not authorized to delete this item" });
       }
-      return null; // Return a value to satisfy consistent-return rule
+      return item.deleteOne().then(() => {
+        res.send({ message: "Item deleted" });
+      });
     })
     .catch((err) => {
       if (err.statusCode === 404) {
@@ -66,57 +64,41 @@ const likeItem = (req, res) => {
     { new: true }
   )
     .orFail(() => {
-      const error = new Error("Item ID was not found");
-      error.statusCode = 404;
-      throw error;
+      handleFailError();
     })
-    .then(() => {
-      res.status(200).send({ message: "Item has been successfully liked" });
-    })
+    .then(() =>
+      res.status(200).send({ message: "Item has been successfully liked" })
+    )
     .catch((err) => {
-      handleFailError(req, res, err);
+      handleCatchError(err, res);
     });
 };
 
-const dislikeItem = (req, res) => {
+function dislikeItem(req, res) {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $pull: { likes: req.user._id } },
     { new: true }
   )
-    .orFail(() => {
-      const error = new Error("Item ID was not found");
-      error.statusCode = 404;
-      throw error;
-    })
-    .then((item) => {
-      res.status(200).send({ data: item });
-    })
+    .orFail()
+    .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
       console.error(err);
-      handleFailError(req, res, err);
+      handleCatchError(err, res);
     });
-};
+}
 
 const updateItem = (req, res) => {
-  const { itemId } = req.params;
+  const { itemId } = req.param;
   const { imageUrl } = req.body;
 
-  ClothingItem.findOneAndUpdate(
-    { _id: itemId },
-    { $set: { imageUrl } },
-    { new: true }
-  )
+  ClothingItem.findOneAndUpdate(itemId, { $set: { imageUrl } })
     .orFail(() => {
-      const error = new Error("Item ID was not found");
-      error.statusCode = 404;
-      throw error;
+      handleFailError();
     })
-    .then((item) => {
-      res.status(200).send({ data: item });
-    })
+    .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
-      handleCatchError(req, res, err);
+      handleCatchError(err, res);
     });
 };
 

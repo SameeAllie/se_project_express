@@ -8,30 +8,10 @@ const {
 } = require("../utils/errors");
 const { JWT_SECRET } = require("../utils/config");
 
-const createUser = (req, res) => {
-  const { name, avatar, email, password } = req.body;
-  bcrypt
-    .hash(password, 10)
-    .then((hash) => {
-      User.create({ name, avatar, email, password: hash })
-        .then((user) => {
-          const userData = user.toObject();
-          delete userData.password;
-          return res.status(201).send({ data: userData });
-        })
-        .catch((err) => {
-          handleCatchError(res, err);
-        });
-    })
-    .catch((err) => {
-      handleCatchError(res, err);
-    });
-};
-
 const getCurrentUser = (req, res) => {
-  console.log(req.user);
-  const { userId } = req.user;
-  User.findById(userId)
+  const { _id } = req.user; // Retrieve user ID from req.user object
+
+  User.findById(_id)
     .orFail(() => {
       handleFailError();
     })
@@ -39,6 +19,25 @@ const getCurrentUser = (req, res) => {
     .catch((err) => {
       handleCatchError(err, res);
     });
+};
+
+const createUser = (req, res) => {
+  const { name, avatar, email, password } = req.body;
+
+  if (!password) {
+    return res.status(400).send({ error: "Password is required" });
+  }
+
+  bcrypt.hash(password, 10).then((hash) => {
+    User.create({ name, avatar, email, password: hash })
+      .then((user) => {
+        const userData = user.toObject();
+        delete userData.password;
+        return res.status(201).send({ data: userData });
+      })
+      .catch((err) => handleCatchError(err, res));
+  });
+  return undefined;
 };
 
 const updateUser = (req, res) => {
