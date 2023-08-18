@@ -13,7 +13,7 @@ const createItem = (req, res) => {
       res.send({ data: item });
     })
     .catch((err) => {
-      handleCatchError(err, res);
+      handleCatchError(req, res, err);
     });
 };
 
@@ -21,7 +21,7 @@ const getItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => res.send(items))
     .catch((err) => {
-      handleCatchError(err, res);
+      handleCatchError(req, res, err);
     });
 };
 
@@ -70,7 +70,7 @@ const likeItem = (req, res) => {
       res.status(200).send({ message: "Item has been successfully liked" })
     )
     .catch((err) => {
-      handleCatchError(err, res);
+      handleCatchError(req, res, err);
     });
 };
 
@@ -84,7 +84,7 @@ function dislikeItem(req, res) {
     .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
       console.error(err);
-      handleCatchError(err, res);
+      handleCatchError(req, res, err);
     });
 }
 
@@ -98,7 +98,7 @@ const updateItem = (req, res) => {
     })
     .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
-      handleCatchError(err, res);
+      handleCatchError(req, res, err);
     });
 };
 

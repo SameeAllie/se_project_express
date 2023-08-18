@@ -35,7 +35,7 @@ const createUser = (req, res) => {
         delete userData.password;
         return res.status(201).send({ data: userData });
       })
-      .catch((err) => handleCatchError(err, res));
+      .catch((err) => handleCatchError(res, err));
   });
   return undefined;
 };
