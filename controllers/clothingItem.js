@@ -66,8 +66,8 @@ const likeItem = (req, res) => {
     .orFail(() => {
       handleFailError();
     })
-    .then(() =>
-      res.status(200).send({ message: "Item has been successfully liked" })
+    .then((item) =>
+      res.status(200).send({ data: item, message: "Item has been successfully liked" })
     )
     .catch((err) => {
       handleCatchError(req, res, err);
@@ -80,8 +80,10 @@ function dislikeItem(req, res) {
     { $pull: { likes: req.user._id } },
     { new: true }
   )
-    .orFail()
-    .then((item) => res.status(200).send({ data: item }))
+    .orFail(() => {
+      handleFailError();
+    })
+    .then(() => res.status(200).send({ message: "Item has been successfully disliked" }))
     .catch((err) => {
       console.error(err);
       handleCatchError(req, res, err);
