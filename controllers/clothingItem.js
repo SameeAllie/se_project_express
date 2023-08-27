@@ -18,6 +18,7 @@ const createItem = (req, res) => {
 };
 
 const getItems = (req, res) => {
+  /* res.send("items") */
   ClothingItem.find({})
     .then((items) => res.send(items))
     .catch((err) => {
@@ -63,15 +64,12 @@ const likeItem = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true }
   )
-    .orFail(() => {
-      handleFailError();
-    })
-    .then((item) =>
-      res.status(200).send({ data: item, message: "Item has been successfully liked" })
-    )
-    .catch((err) => {
-      handleCatchError(req, res, err);
-    });
+  .orFail()
+  .then((item) => res.status(200).send({ data: item }))
+  .catch((err) => {
+    console.error(err);
+    handleCatchError(req, res, err);
+  });
 };
 
 function dislikeItem(req, res) {
@@ -80,10 +78,8 @@ function dislikeItem(req, res) {
     { $pull: { likes: req.user._id } },
     { new: true }
   )
-    .orFail(() => {
-      handleFailError();
-    })
-    .then(() => res.status(200).send({ message: "Item has been successfully disliked" }))
+    .orFail()
+    .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
       console.error(err);
       handleCatchError(req, res, err);
