@@ -1,4 +1,3 @@
-
 WTWR Project
 Description
 The WTWR project is a web application that aims to provide a platform for users to share and discover fashion outfits suitable for different weather conditions. Users can create clothing items, associate them with weather conditions (hot, warm, or cold), and browse outfits created by other users. The project focuses on creating a server-side application using Express.js and implementing user authorization and authentication.

@@ -26,8 +26,7 @@ const validateCreatedItem = celebrate({
   }),
 });
 
-const validateCreatedUserInfo = celebrate({
-  //
+const validateUserInfo = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30).messages({
       "string.min": 'The minimum length of the "name" field is 2',
@@ -51,22 +50,7 @@ const validateCreatedUserInfo = celebrate({
   }),
 });
 
-const validateUpdateNameAndAvatar = celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30).messages({
-      "string.min": 'The minimum length of the "name" field is 2',
-      "string.max": 'The maximum length of the "name" field is 30',
-      "string.empty": 'The "name" field must be filled in',
-    }),
-    avatar: Joi.string().required().custom(validateURL).messages({
-      "string.empty": 'The "avatar" field must be filled in',
-      "string.uri": 'The "avatar" field must be a valid URL',
-    }),
-  }),
-});
-
-const validateLogin = celebrate({
-  //
+const validateAuthentication = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email().messages({
       "string.empty": 'The "email" field must be filled in',
@@ -86,13 +70,17 @@ const validateID = celebrate({
       "string.hex": "The itemId parameter must be a hexadecimal value",
       "any.required": "The itemId parameter is required",
     }),
+    // userId: Joi.string().length(24).hex().required().messages({
+    //   "string.length": "The userId parameter must be 24 characters long",
+    //   "string.hex": "The userId parameter must be a hexadecimal value",
+    //   "any.required": "The userId parameter is required",
+    // }),
   }),
 });
 
 module.exports = {
   validateCreatedItem,
-  validateCreatedUserInfo,
-  validateLogin,
+  validateUserInfo,
+  validateAuthentication,
   validateID,
-  validateUpdateNameAndAvatar,
 };
