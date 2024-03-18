@@ -1,9 +1,7 @@
 const ClothingItem = require("../models/clothingItem");
-const {
-  BadRequestError,
-  NotFoundError,
-  ForbiddenError,
-} = require("../utils/errors");
+const NotFoundError = require("../utils/errors/NotFoundError");
+const BadRequestError = require("../utils/errors/BadRequestError");
+const ForbiddenError = require("../utils/errors/ForbiddenError");
 
 const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
@@ -28,8 +26,7 @@ const getItems = (req, res, next) => {
 const deleteItem = (req, res, next) => {
   const { itemId } = req.params;
 
-  clothingItem
-    .findById(itemId)
+  ClothingItem.findById(itemId)
     .then((item) => {
       if (!item) {
         throw new NotFoundError("Item not found");
