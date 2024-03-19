@@ -9,6 +9,8 @@ const errorHandler = require("./middlewares/error-handler");
 
 const { PORT = 3001 } = process.env;
 
+// const mongoose = require("mongoose");
+
 mongoose.set("strictQuery", false);
 
 const app = express();
@@ -32,4 +34,5 @@ app.use(errors());
 app.use(errorHandler);
 
 app.listen(PORT, () => {
+  // console.log(`App is listening at port ${PORT}`);
 });
