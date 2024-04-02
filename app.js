@@ -6,10 +6,9 @@ const cors = require("cors");
 const { errors } = require("celebrate");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 const errorHandler = require("./middlewares/error-handler");
+const limiter = require("./rateLimitConfig"); // Import the rate limiting middleware
 
-const { PORT = 3000 } = process.env;
-
-// const mongoose = require("mongoose");
+const { PORT = 3001 } = process.env;
 
 mongoose.set("strictQuery", false);
 
@@ -21,6 +20,9 @@ const routes = require("./routes");
 app.use(express.json());
 app.use(cors());
 app.use(requestLogger);
+
+// Apply the rate limiting middleware
+app.use(limiter);
 
 app.get("/crash-test", () => {
   setTimeout(() => {
@@ -34,5 +36,5 @@ app.use(errors());
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-  // console.log(`App is listening at port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
